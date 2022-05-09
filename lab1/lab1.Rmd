@@ -47,7 +47,7 @@ Lets warm up your R (tydyverse) skills and make use of Nastay's lecture
 mtcars |> 
 ggplot(aes(x  =wt, y = mpg)) +
   geom_point()+
-  ggtitle("2 D")+
+  ggtitle("2 Dimensions")+
   theme_minimal()
 ```
 
@@ -57,7 +57,7 @@ What is wrong with the following visualization?
 mtcars |> 
 ggplot(aes(x  =wt, y = mpg, color = gear)) +
   geom_point()+
-  ggtitle("3 D, continious?")+
+  ggtitle("3 Dimensions, continious?")+
   theme_minimal()
 ```
 
@@ -67,7 +67,7 @@ What is the difference between categorical variable and factor?
 mtcars |> 
 ggplot(aes(x  =wt, y = mpg, color = gear |> as_factor())) +
   geom_point()+
-  ggtitle("3 D")+
+  ggtitle("3 Dimensions")+
   theme_minimal()
 ```
 
@@ -79,7 +79,7 @@ ggplot(aes(x  =wt, y = mpg,
            color = gear |> as_factor(),
            size = cyl)) +
   geom_point()+
-  ggtitle("4 D")+
+  ggtitle("4 Dimensions")+
   theme_minimal()
 ```
 
@@ -92,7 +92,7 @@ ggplot(aes(x =wt, y = mpg,
            size = cyl |> as.factor())) +
   geom_point()+
   facet_wrap(~cyl)+ 
-  ggtitle("4 D", "distinct by Number of cylinders")+
+  ggtitle("4 Dimensions", "distinct by Number of cylinders")+
   theme_minimal()
 ```
 
@@ -106,7 +106,7 @@ ggplot(aes(x =wt, y = mpg,
   geom_point()+
   stat_smooth(method='lm')+
   facet_wrap(~cyl)+
-  ggtitle("4 D", "with statistics, but something is wrong")+
+  ggtitle("4 Dimensions", "with statistics, but something is wrong")+
   theme_minimal()
 ```
 
@@ -121,7 +121,7 @@ ggplot(aes(x =wt, y = mpg,
     geom_smooth(method='lm')+
   geom_point(aes(size = cyl |> as.factor()))+
   # facet_wrap(~cyl)+
-  ggtitle("4 D", "with statistics")+
+  ggtitle("4 Dimensions", "with statistics")+
   theme_minimal()
 ```
 
@@ -134,7 +134,7 @@ ggplot(aes(x =wt, y = mpg,
   geom_smooth(method='lm', alpha = 0.1, size = 0)+
   geom_line(stat="smooth",method = "lm", size  = 1.5, alpha = 0.5)+
   geom_point(aes(size = cyl |> as.factor()))+
-  ggtitle("4 D", "with statistics from basic attributes")+
+  ggtitle("4 Dimensions", "with statistics from basic attributes")+
   theme_minimal()
 ```
 
@@ -147,7 +147,7 @@ ggplot(aes(x =wt, y = mpg,
   geom_smooth(method='lm', alpha = 0.1, size = 0)+
   geom_line(stat="smooth",method = "lm", size  = 1.5, alpha = 0.5)+
   geom_point(aes(size = cyl |> as.factor()))+
-  ggtitle("4 D", "with statistics from basic attributes")+
+  ggtitle("4 Dimensions", "with statistics from basic attributes")+
   scale_color_brewer(palette = "Set1")+
   theme_minimal()
 ```
@@ -166,7 +166,7 @@ ggplot(aes(x =wt, y = mpg,
   geom_smooth(method='lm', alpha = 0.1, size = 0)+
   geom_line(stat="smooth",method = "lm", size  = 1.5, alpha = 0.5)+
   geom_point(aes(size = cyl |> as.factor()))+
-  ggtitle("4 D", "with statistics from basic attributes")+
+  ggtitle("4 Dimensions", "with statistics from basic attributes")+
   # see::scale_color_material_d()+
   see::scale_color_social()+
   theme_minimal()
