@@ -38,13 +38,21 @@ str(Minard.temp)
 ```
 
 ```{r}
- ggplot(Minard.troops, aes(long, lat)) +
-        geom_path(aes(size = survivors))
+options(scipen=99)
+
+ ggplot(data = Minard.troops, aes(x = long, y = lat)) +
+      geom_path(aes(size = survivors))
+ 
+
+```
+
+```{r}
+Minard.troops
 ```
 
 ```{r}
 ggplot(Minard.troops, aes(long, lat)) +
-        geom_path(aes(size = survivors, colour = direction, group = group)) +
+    geom_path(aes(size = survivors, colour = direction, group = group)) +
     coord_fixed()
 ```
 
@@ -57,7 +65,7 @@ ggplot(Minard.troops, aes(long, lat)) +
                breaks=breaks, labels=scales::comma(breaks)) +
     scale_color_manual("Direction", 
                        values = c("#E8CBAB", "#1F1A1B"), 
-                       labels=c("Advance", "Retreat")) 
+                       labels=c("Advance", "Retreat"))
 ```
 
 ```{r}
@@ -70,7 +78,7 @@ plot_troops +
 ```{r}
 plot_troops +   
     geom_point(data = Minard.cities) +
-  geom_text(data = Minard.cities, aes(label = city), vjust = 1.5) 
+  geom_text(data = Minard.cities, aes(label = city), vjust = 1.5)
 ```
 
 ```{r}
@@ -85,6 +93,8 @@ plot_troops_cities <- last_plot()
 ```
 
 ```{r}
+Minard.temp |> kableExtra::kable()
+
 ggplot(Minard.temp, aes(long, temp)) +
     geom_path(color="grey", size=1.5) +
     geom_point(size=2) 
@@ -115,6 +125,10 @@ plot_temp <- last_plot()
 ```
 
 ### draft
+
+```{r}
+plot_temp
+```
 
 ```{r}
 gridExtra::grid.arrange(plot_troops_cities, plot_temp)
@@ -149,8 +163,9 @@ plot_temp_fixed <- last_plot()
 ```
 
 ```{r}
+library(grid)
 gridExtra::grid.arrange(plot_troops_cities_fixed, plot_temp_fixed, nrow=2, heights=c(3.5, 1.2))
-grid.rect(width = .99, height = .99, gp = gpar(lwd = 2, col = "gray", fill = NA))
+grid::grid.rect(width = .99, height = .99, gp = gpar(lwd = 2, col = "gray", fill = NA))
 ```
 
 ### map
@@ -163,29 +178,40 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 ```
 
 ```{r}
+ggplot() +
+  geom_sf(data = world)
+```
 
+```{r}
+?geom_sf
 Minard.cities$long |> max()
 Minard.cities$lat |> max()
 # Minard.troops |> 
 ggplot() +
-    geom_sf(data = world)+
-  geom_path(data  = Minard.troops, aes(long, lat, size = survivors, colour = direction, group = group)) +
-      scale_size("Survivors", range = c(1,10),
-               breaks=breaks, labels=scales::comma(breaks)) +
-    scale_color_manual("Direction", 
-                       values = c("#E8CBAB", "#1F1A1B"), 
-                       labels=c("Advance", "Retreat")) +
+  geom_sf(data = world) +
+  geom_path(data  = Minard.troops,
+            aes(long, lat,
+              size = survivors,
+              colour = direction,
+              group = group
+            )) +
+  scale_size(
+    "Survivors",
+    range = c(1, 10),
+    breaks = breaks,
+    labels = scales::comma(breaks)
+  ) +
+  scale_color_manual(
+    "Direction",
+    values = c("#E8CBAB", "#1F1A1B"),
+    labels = c("Advance", "Retreat")
+  ) +
   geom_point(data = Minard.cities, aes(long, lat)) +
-  geom_text_repel(data = Minard.cities, aes(long, lat, label = city))+
-  coord_sf(xlim = c(18, 38), ylim = c(50, 58), expand = FALSE)+
+  geom_text_repel(data = Minard.cities, aes(long, lat, label = city)) +
+  coord_sf(xlim = c(18, 38),
+           ylim = c(50, 58),
+           expand = FALSE) +
   theme_void()
-```
-
-```{r}
-ggplot(Minard.troops, aes(long, lat)) +
-  geom_path(aes(size = survivors, colour = direction, group = group)) +
-  coord_quickmap()
-
 ```
 
 ## Data
@@ -233,7 +259,8 @@ What is the difference between categorical variable and factor?
 
 ```{r}
 mtcars |> 
-ggplot(aes(x  =wt, y = mpg, color = gear |> as_factor())) +
+mutate(gear  = gear |> as_factor()) |> 
+ggplot(aes(x  =wt, y = mpg, color = gear)) +
   geom_point()+
   ggtitle("3 Dimensions")+
   theme_minimal()
@@ -256,10 +283,10 @@ What is the difference between these two graphs? How different will be your stor
 ```{r}
 mtcars |> 
 ggplot(aes(x =wt, y = mpg, 
-           color = gear |> as_factor(),
+           # color = gear |> as_factor(),
            size = cyl |> as.factor())) +
   geom_point()+
-  facet_wrap(~cyl)+ 
+  facet_wrap(~gear)+ 
   ggtitle("4 Dimensions", "distinct by Number of cylinders")+
   theme_minimal()
 ```
@@ -387,17 +414,21 @@ Why do we have almost the same median for holidays and non holidays?
 bikes |> 
   mutate(holiday = holiday |> as.logical()) |> 
     ggplot(aes(x = holiday, y = count))+
-    geom_boxplot()+
     geom_jitter(alpha = 0.1)+
+      geom_boxplot(alpha = 0.9)+
     theme_minimal()
 ```
+
+### geom_violin
+
+<https://www.autodesk.com/research/publications/same-stats-different-graphs>
 
 ```{r}
 bikes |> 
   mutate(holiday = holiday |> as.logical()) |> 
     ggplot(aes(x = holiday, y = count))+
-    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), trim = FALSE)+
     geom_jitter(alpha = 0.1)+
+      geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+
     theme_minimal()
 ```
 
@@ -431,56 +462,6 @@ p2 +
   stat_compare_means(comparisons = my_comparisons)+ 
   # Add pairwise comparisons p-value
   stat_compare_means(label.y = 1600)
-```
-
-### manipulations and data quality
-
-```{r}
-bikes |> 
-  ggplot(aes(x = atemp, y = count))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_minimal()
-```
-
-```{r}
-bikes |> 
-  ggplot(aes(x = atemp, y = count))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-  theme_minimal()+
-    scale_y_log10()
-```
-
-```{r}
-bikes |> 
-  filter(atemp>=30 & atemp <=45) |> 
-  ggplot(aes(x = atemp, y = count))+
-  geom_point()+
-  geom_smooth(method = "lm")+
-    scale_y_log10()+
-  xlim(30, 45)+
-  theme_minimal()
-```
-
-### kind of a solution
-
-```{r}
-bikes |> 
-  ggplot(aes(x = atemp, y = count))+
-  geom_jitter(width = 0.2, height = 0.2, alpha = 0.4)+
-  geom_smooth(method = "lm")+
-  scale_y_log10()+
-  theme_minimal()
-```
-
-```{r}
-bikes |> 
-  ggplot(aes(x = atemp, y = count))+
-  geom_jitter(width = 0.2, height = 0.2, alpha = 0.4)+
-  geom_smooth(method = "lm")+
-  scale_y_log10()+
-  theme_minimal()
 ```
 
 ### diamonds

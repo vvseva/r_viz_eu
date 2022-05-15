@@ -1,0 +1,71 @@
+slider,slider_count,value_count,value,stga_value
+Meet people,35,3,"NAND",22
+Meet people,35,10,Agree,22
+Meet people,35,22,Strongly agree,22
+Travel,34,1,Disagree,21
+Travel,34,12,Agree,21
+Travel,34,21,Strongly agree,21
+Exchange experience,34,2,"NAND",20
+Exchange experience,34,12,Agree,20
+Exchange experience,34,20,Strongly agree,20
+Complete,35,4,Disagree,15
+Complete,35,5,"NAND",15
+Complete,35,11,Agree,15
+Complete,35,15,Strongly agree,15
+Independent life,35,1,Disagree,15
+Independent life,35,6,"NAND",15
+Independent life,35,13,Agree,15
+Independent life,35,15,Strongly agree,15
+Correspondence,35,2,Strongly disagree,14
+Correspondence,35,3,"NAND",14
+Correspondence,35,16,Agree,14
+Correspondence,35,14,Strongly agree,14
+Interesting,35,3,Strongly disagree,14
+Interesting,35,2,Disagree,14
+Interesting,35,3,"NAND",14
+Interesting,35,13,Agree,14
+Interesting,35,14,Strongly agree,14
+Advance courses,34,1,Strongly disagree,11
+Advance courses,34,2,Disagree,11
+Advance courses,34,6,"NAND",11
+Advance courses,34,14,Agree,11
+Advance courses,34,11,Strongly agree,11
+Improve my English,34,3,Strongly disagree,10
+Improve my English,34,5,Disagree,10
+Improve my English,34,7,"NAND",10
+Improve my English,34,9,Agree,10
+Improve my English,34,10,Strongly agree,10
+Overload,35,1,Strongly disagree,10
+Overload,35,10,Disagree,10
+Overload,35,5,"NAND",10
+Overload,35,9,Agree,10
+Overload,35,10,Strongly agree,10
+Work,35,1,Strongly disagree,10
+Work,35,6,Disagree,10
+Work,35,4,"NAND",10
+Work,35,14,Agree,10
+Work,35,10,Strongly agree,10
+Learn culture,35,1,Disagree,6
+Learn culture,35,5,"NAND",6
+Learn culture,35,23,Agree,6
+Learn culture,35,6,Strongly agree,6
+Move in the future,35,1,Strongly disagree,6
+Move in the future,35,11,Disagree,6
+Move in the future,35,11,"NAND",6
+Move in the future,35,6,Agree,6
+Move in the future,35,6,Strongly agree,6
+Letter,35,3,Strongly disagree,4
+Letter,35,10,Disagree,4
+Letter,35,13,"NAND",4
+Letter,35,5,Agree,4
+Letter,35,4,Strongly agree,4
+Difficulty,35,1,Strongly disagree,3
+Difficulty,35,12,Disagree,3
+Difficulty,35,7,"NAND",3
+Difficulty,35,12,Agree,3
+Difficulty,35,3,Strongly agree,3
+Prerequisites,35,2,Strongly disagree,2
+Prerequisites,35,16,Disagree,2
+Prerequisites,35,7,"NAND",2
+Prerequisites,35,8,Agree,2
+Prerequisites,35,2,Strongly agree,2

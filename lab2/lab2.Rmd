@@ -1,0 +1,413 @@
+---
+title: "lab2"
+author: "Suschevskiy Vsevolod"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+```
+
+## one of HW solutions
+
+```{r}
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+```{r}
+students_data <- read_csv("~/r_viz_eu/lab1/data/students_data.csv")
+students_data |> head()
+```
+
+```{r}
+students_data |>
+  # mutate_all(as.integer) |>
+  pivot_longer(c(everything(),-profile),
+               names_to = "measures",
+               values_to = "values") -> df_to_plt
+df_to_plt |> 
+  head()
+```
+
+```{r}
+df_to_plt |> 
+  ggplot(aes(y = values, x = measures, color = profile))+
+  geom_jitter(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+```
+
+```{r}
+df_to_plt |> 
+  filter(measures != "attemps") |> 
+  ggplot(aes(y = values, x = measures, color = profile))+
+  geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+```
+
+```{r}
+df_to_plt |> 
+  filter(measures != "attemps") |> 
+  ggplot(aes(y = values, x = measures, color = profile))+
+  geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+```
+
+```{r}
+students_data |>
+  mutate(across(where(is.numeric), ~ . - mean(.)))
+```
+
+```{r}
+students_data |>
+  mutate(across(where(is.numeric), ~ (. / max(.)) |> round(3))) |> 
+  pivot_longer(c(everything(),-profile),
+               names_to = "measures",
+               values_to = "values") -> df_to_plt_poms
+
+df_to_plt_poms
+```
+
+```{r}
+df_to_plt_poms |> 
+    ggplot(aes(y = values, x = measures, color = profile))+
+  geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+```
+
+```{r}
+df_to_plt_poms |> 
+  ggplot(aes(y = values, x = measures, color = profile))+
+  geom_jitter(position = position_jitter(seed = 2019, width = 0.3, height = 0.00), alpha = 0.2)+
+  geom_boxplot(alpha = 0.5, outlier.shape = NA, coef = 0)+
+  ggtitle("Latent Profiles of Engagement" )+
+  scale_color_brewer(palette = "Set2")+
+  xlab("")+
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  theme(legend.position = c(0.8, 0.8),
+      axis.title = element_text(size = 16),
+      axis.text.x = element_text(family = "Roboto Mono", size = 12),
+      axis.text.y = element_text(family = "Roboto Mono", size = 12),
+      legend.text = element_text(family = "Roboto Mono", size = 10, color = "grey42"),
+      legend.title = element_text(family = "Roboto Mono", size = 12, color = "grey52"),
+      # panel.grid = element_blank(),
+      legend.key = element_rect(colour = "transparent", fill = "transparent")
+)+
+  ylim(c(0, 1))+
+    annotate(
+    "text", x = 1.5, y = 0.85, family = "Poppins", size = 3, color = "gray20",
+    label = "Maximum: \n 4090 attempts"
+  )+
+  annotate(
+    "text", x = 5, y = 0.15, family = "Poppins", size = 3, color = "gray20",
+    label = "2 days before \n the exam"
+  )+
+  annotate(
+    "text", x = 6, y = 0.7, family = "Poppins", size = 3, color = "gray20",
+    label = "13% of attempts \n in gamified modes"
+  )+
+  geom_curve(
+    data = data.frame(
+      x1 = c(1.5, 5, 6),
+      y1 = c(0.9, 0.2 ,0.75),
+      x2 = c(1.2, 6 ,5.2),
+      y2 = c(1, 0.38, 0.867)
+    ),
+    aes(
+      x = x1,
+      y = y1,
+      xend = x2,
+      yend = y2
+    ),
+    arrow = arrow(length = unit(0.07, "inch")),
+    size = 0.4,
+    color = "gray20",
+    curvature = 0.4
+  ) -> poms_plot
+
+poms_plot
+
+ggsave(filename = "LPA_GGPLOT4_fixed.png", width = 10, height = 5)
+```
+
+## use some of this code to improve your hm graph (10 minutes)
+
+```{r}
+
+```
+
+## highlight your stuff
+
+[Introduction to gghighlight (r-project.org)](https://cran.r-project.org/web/packages/gghighlight/vignettes/gghighlight.html)
+
+```{r}
+library(gghighlight)
+
+df_to_plt_poms |> 
+    ggplot(aes(y = values, x = measures, fill = profile))+
+geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+
+  gghighlight(measures == "mean_time")
+```
+
+## add proper dotplot
+
+```{r}
+df_to_plt_poms |>
+  ggplot(aes(y = values, x = measures, fill = profile)) +
+  geom_dotplot(
+    binaxis = 'y',
+    stackdir = 'center',
+    position = position_dodge(0.8),
+    binwidth = 0.01
+  ) +
+  geom_boxplot(alpha = 0.7)+
+  gghighlight(measures == "mean_time")
+```
+
+```{r}
+df_to_plt_poms |>
+  ggplot(aes(x = measures, y = values)) +
+  geom_boxplot(aes(fill = profile))+
+  facet_wrap(~profile) +
+  gghighlight()
+
+iris |> 
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_boxplot(aes(fill = Species)) +
+  facet_wrap(~Species) +
+  gghighlight() +
+  theme(legend.position = "top") +
+  labs(title = "Example 4 - highlight for box plot")
+```
+
+## more statistics
+
+[ggplot2 Based Plots with Statistical Details • ggstatsplot (indrajeetpatil.github.io)](https://indrajeetpatil.github.io/ggstatsplot/)
+
+```{r}
+# library(ggstatsplot)
+# ## since the confidence intervals for the effect sizes are computed using
+# ## bootstrapping, important to set a seed for reproducibility
+# set.seed(123)
+# 
+# ## function call
+# ggbetweenstats(
+#   data = dplyr::filter(gapminder::gapminder, year == 2007, continent != "Oceania"),
+#   x = continent,
+#   y = lifeExp
+# )
+```
+
+## ridges
+
+```{r}
+library(ggridges)
+
+df_to_plt_poms |> 
+  ggplot(aes(x = values, y = measures))+
+  geom_density_ridges()
+
+
+df_to_plt_poms |> 
+  ggplot(aes(x = values, y = measures, fill = profile))+
+  geom_density_ridges_gradient()
+
+
+df_to_plt_poms |> 
+  ggplot(aes(x = values, y = measures,fill = stat(x)))+
+  geom_density_ridges_gradient()+
+  scale_fill_viridis_c(name = "Temp. [F]", option = "C") 
+```
+
+```{r}
+df_to_plt_poms |> 
+  ggplot(aes(x = values, y = measures))+
+  geom_density_ridges(
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0.9,
+  )
+```
+
+## uncertainty visualization
+
+```{r}
+library(ggdist)
+library(beeswarm)
+
+set.seed(1234)
+x = rnorm(100)
+
+make_plot = function(layout) {
+  expand.grid(
+    x = x,
+    side = c("topright", "both", "bottomleft"),
+    stringsAsFactors = FALSE
+  ) |> 
+    ggplot(aes(side = side, x = x)) +
+    stat_dotsinterval(layout = layout) +
+    facet_grid(~ side, labeller = "label_both") +
+    labs(
+      subtitle = paste0("stat_dotsinterval(layout = '", layout, "')"),
+      x = NULL,
+      y = NULL
+    )
+}
+
+make_plot("bin") 
+make_plot("weave") 
+make_plot("swarm")
+```
+
+```{r}
+set.seed(1234)
+
+abc_df = data.frame(
+  value = rnorm(300, mean = c(1,2,3), sd = c(1,2,2)),
+  abc = c("a", "b", "c")
+)
+
+abc_df %>%
+  ggplot(aes(x = abc, y = value)) +
+  stat_dots(side = "both") +
+  ggtitle('stat_dots(side = "both")')
+```
+
+```{r}
+df_to_plt_poms$measures |> as.factor() |>  summary()
+
+df_to_plt_poms |> 
+  filter(measures %in% c("attemps", "correct", "min_time")) |> 
+  ggplot(aes(y = measures, x = values, fill = measures)) +
+  stat_slab(aes(thickness = stat(pdf*n)), scale = 1) +
+  stat_dotsinterval(side = "bottom", scale = 1, slab_size = NA) +
+  scale_fill_brewer(palette = "Set2") +
+  ggtitle("rainplot")
+```
+
+```{r}
+df_to_plt_poms |> 
+  filter(measures %in% c("attemps", "correct", "min_time")) |> 
+  ggplot(aes(y = measures, x = values, fill = profile)) +
+  stat_slab(aes(thickness = stat(pdf*n)), scale = 1) +
+  stat_dotsinterval(side = "bottom", scale = 1, slab_size = NA) +
+  scale_fill_brewer(palette = "Set2") +
+  ggtitle("rainplot by profile")
+```
+
+## Likert vizualization
+
+```{r}
+likert = read_csv("data/likert.csv") |> mutate(value = value |> factor(levels = rev(
+    c(
+      "Strongly agree",
+      "Agree",
+      "NAND",
+      "Disagree",
+      "Strongly disagree"
+    )
+  )))
+
+cols = c("Strongly agree" = "#0571b0", "Agree" = "#92c5de",  "NAND" = "#f7f7f7","Disagree" = "#f4a582", "Strongly disagree" = "#ca0020")
+
+likert |> 
+ggplot()+
+geom_bar(aes(x = reorder(slider, stga_value), y = value_count, fill = value), 
+         position="fill", stat = "identity")+
+  coord_flip()+
+  ggthemes::theme_tufte()+
+  ggtitle(label = "Likert scale", subtitle = "Exchange priorities")+
+  ylab("Percentage")+
+  xlab("Scale")+
+  theme(legend.position = "bottom")+
+  scale_fill_manual(values = cols)
+```
+
+```{r}
+likert %>% filter(value%in%c("Agree", "Strongly agree")) |> 
+    mutate(value = value %>% factor(levels = c("Strongly agree", "Agree"), ordered = TRUE)) -> likert_a
+likert %>% filter(!value%in%c("Agree", "Strongly agree")) |>
+  mutate(value = value %>% factor(levels = c("Strongly disagree", "Disagree", "NAND"), ordered = TRUE))->likert_d
+
+
+
+ggplot()+
+  geom_bar(
+    data = likert_a,
+    aes(
+      x = reorder(slider, stga_value),
+      y = -value_count,
+      fill = value
+    ),
+    stat = "identity"
+  ) +
+  geom_bar(
+    data = likert_d,
+    aes(
+      x = reorder(slider, stga_value),
+      y = value_count,
+      fill = value
+    ),
+    stat = "identity"
+  )+
+  geom_hline(yintercept = 0, color =c("white")) +
+  coord_flip()+
+  ggthemes::theme_tufte()+
+  ggtitle(label = "Likert scale", subtitle = "Exchange priorities")+
+  ylab("Count")+
+  xlab("Scale")+
+  theme(legend.position = "bottom")+
+  scale_fill_manual(values = cols)
+```
+
+## hw2
+
+поменяйте дату рождения на свою дату рождения или дату рождения вашего любимого актёра или актрисы
+
+```{r}
+my_bd = "28/08/1998"
+
+my_seed = my_bd |> lubridate::dmy() |> as.numeric()
+
+elements = c("ggridges", "anotate with arrows", "change fonts", 
+             "gghighlight", "ggdist", "ggExtra", 
+             "ggpattern", "ggstatsplot or ggpubr", "gganimate")
+
+print("В HW2 вам нужно изспользовать 3 из 4 пакетов или слоёв на графике")
+print("Вот они слева направо:")
+
+set.seed(my_seed)
+elements |> 
+  sample(4) |> 
+  paste(collapse = ", ")
+```
+
+Вы можете использовать свои данные, или поисследовать самолёты.
+
+Про самолёты есть набор вопросов, которые могут задать вам направление для анализа.
+
+На вопросы необязательно отвечать, тем более их много и для части из них нужно делать текстовый анализ. Используйте их как вдохновение, либо действительно попробуйте ответить на них, но главное используйте пакеты из предыдущего чанка.
+
+Не в каждом графике нужно использовать все пакеты сразу
+
+можно делать в парах, сдаёте одну работу, указываете авторов
+
+[сдавать сюда](https://forms.yandex.ru/cloud/62814b206c0f0e2f4bb7efea/)
+
+## данные
+
+<https://github.com/quankiquanki/skytrax-reviews-dataset/blob/master/README.md>
+
+```{r}
+airline <- read_csv("~/r_viz_eu/lab2/data/airline.csv")
+airport <- read_csv("~/r_viz_eu/lab2/data/airport.csv")
+lounge <- read_csv("~/r_viz_eu/lab2/data/lounge.csv")
+seat <- read_csv("~/r_viz_eu/lab2/data/seat.csv")
+
+library(R3PO)
+R3PO:::hw1_questions |> kableExtra::kable()
+```
+
+## additional materials
+
+[Pu, X., & Kay, M. (2020, April). A probabilistic grammar of graphics. In Proceedings of the 2020 CHI Conference on Human Factors in Computing Systems (pp. 1-13).](https://doi.org/10.1145/3313831.3376466)
