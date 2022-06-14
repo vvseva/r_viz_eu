@@ -12,6 +12,45 @@ output:
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 ```
 
+<http://www.sthda.com/english/wiki/ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization>
+
+```{r}
+library(ggplot2)
+df <- ToothGrowth
+df$dose <- as.factor(df$dose)
+head(df)
+
+data_summary <- function(data, varname, groupnames){
+  require(plyr)
+  summary_func <- function(x, col){
+    c(mean = mean(x[[col]], na.rm=TRUE),
+      sd = sd(x[[col]], na.rm=TRUE))
+  }
+  data_sum<-ddply(data, groupnames, .fun=summary_func,
+                  varname)
+  data_sum <- rename(data_sum, c("mean" = varname))
+ return(data_sum)
+}
+
+
+df2 <- data_summary(ToothGrowth, varname="len", 
+                    groupnames=c("supp", "dose"))
+
+
+# Convert dose to a factor variable
+df2$dose=as.factor(df2$dose)
+head(df2)
+
+library(ggplot2)
+# Default bar plot
+p<- ggplot(df2, aes(x=dose, y=len, fill=supp)) + 
+  geom_bar(stat="identity", color="black", alpha = 0.8,
+           position=position_dodge()) +
+      geom_errorbar(aes(ymin=len-sd, ymax=len+sd), width=.2,
+                 position=position_dodge(.9)) 
+p
+```
+
 ## one of HW solutions
 
 ```{r}
@@ -20,18 +59,39 @@ theme_set(theme_minimal())
 ```
 
 ```{r}
+library(cowplot)
+library(magick)
+
+bee <- "https://w7.pngwing.com/pngs/785/836/png-transparent-bee-drawing-bee-honey-bee-food-photography.png"
+
+data_by <-  tibble(year = c(2017, 2018, 2019),
+                 tax = c(12, 15, 17))
+
+?draw_image
+
+data_by |>
+  ggplot(aes(x = year, y = tax))+
+  draw_image(image = bee,  x = 2016.5, y = 10.75, scale = 2) +
+  draw_image(image = bee,  x = 2017.5, y = 13.75, scale = 2) +
+  draw_image(image = bee,  x = 2018.5, y = 15.75, scale = 2) +
+  geom_point()+
+  geom_label(aes(label = paste(tax, "%")))+
+  ggtitle("Bee plot")
+```
+
+```{r}
 students_data <- read_csv("~/r_viz_eu/lab1/data/students_data.csv")
 students_data |> head()
 ```
 
 ```{r}
+# ?pivot_longer
 students_data |>
-  # mutate_all(as.integer) |>
-  pivot_longer(c(everything(),-profile),
+  pivot_longer(
+    c(everything(),-profile),
                names_to = "measures",
                values_to = "values") -> df_to_plt
-df_to_plt |> 
-  head()
+df_to_plt
 ```
 
 ```{r}
@@ -42,9 +102,9 @@ df_to_plt |>
 
 ```{r}
 df_to_plt |> 
-  filter(measures != "attemps") |> 
+  filter(!measures %in% c("attemps", "mean_time", "max_time", "min_time")) |> 
   ggplot(aes(y = values, x = measures, color = profile))+
-  geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+  geom_point(position = position_jitter(seed = 2019, width = 0.1, height = 0.3), alpha = 0.3)
 ```
 
 ```{r}
@@ -60,17 +120,42 @@ students_data |>
 ```
 
 ```{r}
+
+
+students_data |>
+  mutate(across(where(is.numeric), ~ ((. - min(.)) / (max(.)- min(.))) |> round(3))) |> 
+  pivot_longer(c(everything(),-profile),
+               names_to = "measures",
+               values_to = "values") -> df_to_plt_minmax
+
+
 students_data |>
   mutate(across(where(is.numeric), ~ (. / max(.)) |> round(3))) |> 
   pivot_longer(c(everything(),-profile),
                names_to = "measures",
                values_to = "values") -> df_to_plt_poms
 
-df_to_plt_poms
+df_to_plt_poms |> 
+  tail()
+
+df_to_plt_minmax |> 
+  tail()
+
+tibble(
+  minmax = df_to_plt_minmax |> pull(values),
+  poms = df_to_plt_poms |> pull(values)
+) |> 
+  ggplot(aes(x = minmax, y = poms))+
+  geom_point(alpha = 0.4)
 ```
 
 ```{r}
 df_to_plt_poms |> 
+    ggplot(aes(y = values, x = measures, color = profile))+
+  geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
+
+
+df_to_plt_minmax |> 
     ggplot(aes(y = values, x = measures, color = profile))+
   geom_point(position = position_jitter(seed = 2019, width = 0.3, height = 0), alpha = 0.3)
 ```
@@ -289,7 +374,7 @@ df_to_plt_poms |>
 df_to_plt_poms |> 
   filter(measures %in% c("attemps", "correct", "min_time")) |> 
   ggplot(aes(y = measures, x = values, fill = profile)) +
-  stat_slab(aes(thickness = stat(pdf*n)), scale = 1) +
+  stat_slab(aes(thickness = stat(pdf*n)), scale = 1, alpha = 0.7) +
   stat_dotsinterval(side = "bottom", scale = 1, slab_size = NA) +
   scale_fill_brewer(palette = "Set2") +
   ggtitle("rainplot by profile")
@@ -359,6 +444,25 @@ ggplot()+
   theme(legend.position = "bottom")+
   scale_fill_manual(values = cols)
 ```
+
+## MET brewer
+
+
+```{r}
+devtools::install_github("BlakeRMills/MetBrewer")
+library(MetBrewer)
+
+df_to_plt_poms |> 
+    ggplot(aes(y = values, x = measures, fill = profile))+
+geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))+
+  gghighlight(measures == "mean_time")+
+  # scale_fill_met_d(name = "Archambault")
+scale_fill_manual(values=met.brewer("Archambault", 3))
+
+?scale_color_met_c
+```
+
+
 
 ## hw2
 
